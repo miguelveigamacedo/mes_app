@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container-fluid mt-3">
+  <h2>OEE Dashboard</h2>
+  <p>OEE view embedded from the Dash application.</p>
+
+  <iframe
+      src="/dash/oee/"
+      style="width: 100%; height: 800px; border: none; background: white;">
+  </iframe>
+</div>
+
+{% endblock %}

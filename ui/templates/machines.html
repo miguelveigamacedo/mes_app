@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Machines</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th><th>Code</th><th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in machines %}
+        <tr>
+            <td>{{ m.id }}</td>
+            <td>{{ m.code }}</td>
+            <td>{{ m.name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

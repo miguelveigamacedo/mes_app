@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container-fluid">
+
+  <!-- Branding -->
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="display-4">RubirMES</h1>
+      <p class="lead">Manufacturing Execution & Insights Platform</p>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row">
+
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-info">
+        <div class="inner">
+          <h3>92%</h3>
+          <p>OEE (Today)</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <a href="/dash/oee" class="small-box-footer">View details <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-success">
+        <div class="inner">
+          <h3>18</h3>
+          <p>Active Machines</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-cogs"></i>
+        </div>
+        <a href="/machines" class="small-box-footer">Go to Machines <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-warning">
+        <div class="inner">
+          <h3>5</h3>
+          <p>Orders in Progress</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-tasks"></i>
+        </div>
+        <a href="/orders" class="small-box-footer">View orders <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-danger">
+        <div class="inner">
+          <h3>2</h3>
+          <p>Machines in Fault</p>
+        </div>
+        <div class="icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <a href="/machines" class="small-box-footer">Investigate <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation Cards -->
+  <div class="row mt-4">
+
+    <div class="col-md-4">
+      <div class="card card-primary card-outline">
+        <div class="card-header">
+          <h3 class="card-title">Machines</h3>
+        </div>
+        <div class="card-body">
+          <p>Monitor machine status, availability, and performance.</p>
+          <a href="/machines" class="btn btn-primary btn-block">Go to Machines</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card card-success card-outline">
+        <div class="card-header">
+          <h3 class="card-title">OEE Dashboard</h3>
+        </div>
+        <div class="card-body">
+          <p>View live OEE, losses, and production KPIs.</p>
+          <a href="/dash/oee" class="btn btn-success btn-block">Open OEE Dashboard</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card card-warning card-outline">
+        <div class="card-header">
+          <h3 class="card-title">Orders</h3>
+        </div>
+        <div class="card-body">
+          <p>Plan and track your work orders across all machines.</p>
+          <a href="/orders" class="btn btn-warning btn-block">Order Overview</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

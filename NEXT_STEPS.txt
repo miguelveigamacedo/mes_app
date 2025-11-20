@@ -1,0 +1,18 @@
+
+
+
+CURRENT PROBLEMS:
+
+1. Create the editor of events 
+    1.1 Create the API calls 
+    1.2 Change the front end functionality
+2. Generate a dataset of events for another machine to test
+3. Get familiar with GITHUB
+4. Make the event updater work
+
+
+
+
+
+
+BACKLOG OF FUNCTIONALITIES:
