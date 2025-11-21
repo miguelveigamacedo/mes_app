@@ -1,11 +1,1 @@
-i want to to have the same updating beahviour of updating for workoders.
-Lets test it as a normal script before making it run on a timestamp
-mes.OrderHistory and mes_core.order_run.
-
-you don´t need to match by id but by the workorder field.
-
-The business logic should be:
--Workorders should already exist in mes_core.order_run as they had been previously planned and came from the ERP.
--If the work order doesn´t exists in mes_core.order_run add an entry and concatenate [VOID] at the start.
--Change the name of the mes.OrderHistory table also with the [VOID] concatenation.
-- if produc code doesn´t match to a product in product id, insert a new entry into the Product table also with the [VOID] ahead of the name provided in the mes.OrderHistory, (choose a standard default for the rest of the product table stuff
+This is a test file to test git. 
