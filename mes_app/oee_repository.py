@@ -11,6 +11,7 @@ def fetch_clipped_events(machine_code: str, start_ts: datetime, end_ts: datetime
     de.raw_event_id,
     m.code AS machine_code,
     de.workorder,
+    de.comment,
     rc.code AS reason_code,
     rc.category AS reason_category,
     CASE

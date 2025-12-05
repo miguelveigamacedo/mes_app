@@ -54,6 +54,7 @@ def build_enriched_events(rows, start_ts: datetime, end_ts: datetime):
                         "reason_category": "UPDT",
                         "is_missing": True,
                         "workorder": None,
+                        "comment": None,
                         "units_total": 0.0,
                         "waste_total": 0.0,
                         "target_speed_ups": None,
@@ -85,6 +86,7 @@ def build_enriched_events(rows, start_ts: datetime, end_ts: datetime):
                 "reason_category": r["reason_category"],
                 "is_missing": False,
                 "workorder": r["workorder"],
+                "comment": r.get("comment"),
                 "units_total": units,
                 "waste_total": waste,
                 "target_speed_ups": target_speed,
@@ -101,13 +103,14 @@ def build_enriched_events(rows, start_ts: datetime, end_ts: datetime):
             enriched.append(
                 {
                     "start_ts": pointer,
-                    "end_ts": cs,
+                    "end_ts": end_ts,
                     "duration_sec": gap_sec,
                     "state_bucket": "UPDT",
                     "reason_code": "MISSING",
                     "reason_category": "UPDT",
                     "is_missing": True,
                     "workorder": None,
+                    "comment": None,
                     "units_total": 0.0,
                     "waste_total": 0.0,
                     "target_speed_ups": None,
@@ -413,16 +416,45 @@ def compute_oee(enriched_events):
     }
 
 def serialize_events(enriched_events):
-    return [
-        {
-            "start_ts": e["start_ts"].isoformat(),
-            "end_ts": e["end_ts"].isoformat(),
-            "minutes": e["duration_sec"] / 60.0,
-            "state_bucket": e["state_bucket"],
-            "reason_code": e["reason_code"],
-            "reason_category": e["reason_category"],
-            "is_missing": e["is_missing"],
-            "workorder": e["workorder"],
-        }
-        for e in enriched_events
-    ]
+    serialized = []
+
+    for e in enriched_events:
+        units = float(e.get("units_total", 0.0) or 0.0)
+        waste = float(e.get("waste_total", 0.0) or 0.0)
+        target_speed = e.get("target_speed_ups")
+
+        quality_loss_units = waste
+
+        speed_loss_units = 0.0 if e["state_bucket"] != "RUNNING" else None
+
+        if (
+            e["state_bucket"] == "RUNNING"
+            and target_speed is not None
+            and target_speed > 0
+            and e["duration_sec"] > 0
+        ):
+            theoretical_good_units = float(target_speed) * float(e["duration_sec"])
+            speed_loss_units = theoretical_good_units - units
+            if speed_loss_units < 0:
+                speed_loss_units = 0.0
+
+        serialized.append(
+            {
+                "start_ts": e["start_ts"].isoformat(),
+                "end_ts": e["end_ts"].isoformat(),
+                "minutes": e["duration_sec"] / 60.0,
+                "state_bucket": e["state_bucket"],
+                "reason_code": e["reason_code"],
+                "reason_category": e["reason_category"],
+                "is_missing": e["is_missing"],
+                "workorder": e["workorder"],
+                "comment": e.get("comment"),
+                "units_total": units,
+                "waste_total": waste,
+                "target_speed_ups": target_speed,
+                "quality_loss_units": quality_loss_units,
+                "speed_loss_units": speed_loss_units,
+            }
+        )
+
+    return serialized

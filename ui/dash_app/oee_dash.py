@@ -25,6 +25,7 @@ def fetch_oee(machine_code: str, start_ts: str, end_ts: str):
 def fmt_min(m): return "-" if m is None else f"{m:.1f}"
 def fmt_min_with_unit(m): return "-" if m is None else f"{m:.1f} min"
 def fmt_pct(v): return "-" if v is None else f"{v * 100:.1f}%"
+def fmt_units(v): return "-" if v is None else f"{v:,.0f}"
 
 
 def render_loss_tree(oee_data):
@@ -167,6 +168,39 @@ def render_loss_tree(oee_data):
         ])
     ], style={"borderCollapse": "collapse", "width": "100%", "marginTop": "4px"})
 
+    speed_quality_table = html.Table([
+        html.Thead(html.Tr([
+            html.Th("Metric", style=cell),
+            html.Th("Value", style=cell),
+        ], style=header_row)),
+        html.Tbody([
+            html.Tr([
+                html.Td("Good units", style=cell),
+                html.Td(fmt_units(oee.get("good_units")), style=cell),
+            ]),
+            html.Tr([
+                html.Td("Quality loss (scrap units)", style=cell),
+                html.Td(fmt_units(oee.get("quality_loss_units")), style=cell),
+            ]),
+            html.Tr([
+                html.Td("Speed loss (units)", style=cell),
+                html.Td(fmt_units(oee.get("speed_loss_units")), style=cell),
+            ]),
+            html.Tr([
+                html.Td("Theoretical good @ target speed", style=cell),
+                html.Td(fmt_units(oee.get("theoretical_good_units")), style=cell),
+            ]),
+            html.Tr([
+                html.Td("Performance loss", style=cell),
+                html.Td(fmt_pct(oee.get("performance_loss_pct")), style=cell),
+            ]),
+            html.Tr([
+                html.Td("Quality loss", style=cell),
+                html.Td(fmt_pct(oee.get("quality_loss_pct")), style=cell),
+            ]),
+        ])
+    ], style={"borderCollapse": "collapse", "width": "340px"})
+
     return html.Div([
         html.Div([
             html.Div("Period summary", style={"fontWeight": "600", "marginBottom": "4px"}),
@@ -213,6 +247,17 @@ def render_loss_tree(oee_data):
             "padding": "8px 12px",
             "marginBottom": "16px"
         }),
+
+        html.Div([
+            html.Div("Speed and quality losses", style={"fontWeight": "600", "marginBottom": "4px"}),
+            speed_quality_table,
+        ], style={
+            "backgroundColor": "#fdfbf4",
+            "border": "1px solid #eddca9",
+            "borderRadius": "6px",
+            "padding": "8px 12px",
+            "marginBottom": "16px"
+        }),
     ])
 
 
@@ -224,10 +269,6 @@ def init_dashboard(flask_app):
         url_base_pathname="/dash/oee/",
         suppress_callback_exceptions=True
     )
-
-    machines = fetch_machines()
-    machine_options = [{"label": m["name"], "value": m["code"]} for m in machines]
-    default_machine = machine_options[0]["value"] if machine_options else None
 
     today = date.today()
     default_start_date = today - timedelta(days=6)
@@ -241,8 +282,8 @@ def init_dashboard(flask_app):
                 html.Label("Machine"),
                 dcc.Dropdown(
                     id="oee-machine",
-                    options=machine_options,
-                    value=default_machine,
+                    options=[],
+                    value=None,
                     clearable=False,
                     style={"width": "220px"}
                 )
@@ -302,9 +343,28 @@ def init_dashboard(flask_app):
                      style={"fontSize": "12px"})
         ]),
 
+        dcc.Interval(id="oee-machine-loader", interval=500, n_intervals=0, max_intervals=1),
+
+        html.Div(id="oee-machine-error", style={"color": "red", "marginBottom": "4px"}),
         html.Div(id="oee-error", style={"color": "red", "marginBottom": "8px"}),
         html.Div(id="oee-loss-tree-container")
     ])
+
+    @dash_app.callback(
+        Output("oee-machine", "options"),
+        Output("oee-machine", "value"),
+        Output("oee-machine-error", "children"),
+        Input("oee-machine-loader", "n_intervals"),
+        prevent_initial_call=False,
+    )
+    def load_machines(n_intervals):
+        machines = fetch_machines()
+        if not machines:
+            return [], None, "No machines available. Check the API connection."
+
+        machine_options = [{"label": m.get("name", m.get("code")), "value": m.get("code")} for m in machines]
+        default_machine = machine_options[0]["value"] if machine_options else None
+        return machine_options, default_machine, ""
 
     @dash_app.callback(
         Output("oee-loss-tree-container", "children"),
