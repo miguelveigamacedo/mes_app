@@ -54,8 +54,25 @@ def build_enriched_events(rows, start_ts: datetime, end_ts: datetime):
                         "reason_category": "UPDT",
                         "is_missing": True,
                         "workorder": None,
+                        "units_total": 0.0,
+                        "waste_total": 0.0,
+                        "target_speed_ups": None,
                     }
                 )
+
+        # compute scaled quantities for the clipped interval
+        base_dur = r.get("base_duration_sec") or 0
+        raw_units = r.get("units_total") or 0
+        raw_waste = r.get("waste_total") or 0
+        target_speed = r.get("target_speed_ups")
+
+        if base_dur and base_dur > 0 and dur_sec > 0:
+            scale = dur_sec / base_dur
+        else:
+            scale = 0.0
+
+        units = raw_units * scale
+        waste = raw_waste * scale
 
         # real event
         enriched.append(
@@ -68,8 +85,12 @@ def build_enriched_events(rows, start_ts: datetime, end_ts: datetime):
                 "reason_category": r["reason_category"],
                 "is_missing": False,
                 "workorder": r["workorder"],
+                "units_total": units,
+                "waste_total": waste,
+                "target_speed_ups": target_speed,
             }
         )
+
 
         pointer = ce
 
@@ -80,13 +101,16 @@ def build_enriched_events(rows, start_ts: datetime, end_ts: datetime):
             enriched.append(
                 {
                     "start_ts": pointer,
-                    "end_ts": end_ts,
+                    "end_ts": cs,
                     "duration_sec": gap_sec,
                     "state_bucket": "UPDT",
                     "reason_code": "MISSING",
                     "reason_category": "UPDT",
                     "is_missing": True,
                     "workorder": None,
+                    "units_total": 0.0,
+                    "waste_total": 0.0,
+                    "target_speed_ups": None,
                 }
             )
 
@@ -281,21 +305,25 @@ def compute_system_stop_stats(enriched_events, start_ts: datetime, end_ts: datet
 
 def compute_oee(enriched_events):
     """
-    OEE based on time buckets only.
-    For now:
-    - Availability = runtime / (runtime + PDT + UPDT)
-    - Performance = 1.0
-    - Quality = 1.0
-    - OEE = Availability * Performance * Quality = Availability
-    Missing time is treated as UPDT (by design of enriched_events).
+    OEE with three components:
+    - Availability: runtime / (runtime + PDT + UPDT)
+    - Performance: actual_good / theoretical_good_at_target_speed
+    - Quality: actual_good / (actual_good + scrap)
+    Also returns absolute speed and quality losses for use in loss trees.
     """
     running_sec = 0
     pdt_sec = 0
     updt_sec = 0
 
+    good_units = 0.0
+    scrap_units = 0.0
+    theoretical_good_units = 0.0
+
     for e in enriched_events:
         sec = e["duration_sec"]
         bucket = e["state_bucket"]
+
+        # time buckets
         if bucket == "RUNNING":
             running_sec += sec
         elif bucket == "PDT":
@@ -303,7 +331,19 @@ def compute_oee(enriched_events):
         elif bucket == "UPDT":
             updt_sec += sec
 
+        # production only during real running time (no missing)
+        if bucket == "RUNNING" and not e.get("is_missing", False):
+            u = float(e.get("units_total", 0.0) or 0.0)
+            w = float(e.get("waste_total", 0.0) or 0.0)
+            good_units += u
+            scrap_units += w
+
+            tgt = e.get("target_speed_ups")
+            if tgt is not None and tgt > 0 and sec > 0:
+                theoretical_good_units += float(tgt) * float(sec)
+
     planned_sec = running_sec + pdt_sec + updt_sec
+
     if planned_sec <= 0:
         return {
             "planned_time_min": 0.0,
@@ -314,12 +354,43 @@ def compute_oee(enriched_events):
             "performance": None,
             "quality": None,
             "oee": None,
+            "good_units": 0.0,
+            "scrap_units": 0.0,
+            "total_units": 0.0,
+            "theoretical_good_units": 0.0,
+            "speed_loss_units": None,
+            "quality_loss_units": None,
+            "availability_loss_pct": None,
+            "performance_loss_pct": None,
+            "quality_loss_pct": None,
         }
 
     availability = running_sec / planned_sec
-    performance = 1.0
-    quality = 1.0
-    oee = availability * performance * quality
+
+    total_units = good_units + scrap_units
+    quality = (good_units / total_units) if total_units > 0 else None
+
+    performance = (
+        good_units / theoretical_good_units
+        if theoretical_good_units > 0
+        else None
+    )
+
+    oee = None
+    if availability is not None and performance is not None and quality is not None:
+        oee = availability * performance * quality
+
+    # losses in absolute units and as percentages
+    speed_loss_units = (
+        theoretical_good_units - good_units
+        if theoretical_good_units > 0
+        else None
+    )
+    quality_loss_units = scrap_units
+
+    availability_loss_pct = 1.0 - availability if availability is not None else None
+    performance_loss_pct = 1.0 - performance if performance is not None else None
+    quality_loss_pct = 1.0 - quality if quality is not None else None
 
     return {
         "planned_time_min": planned_sec / 60.0,
@@ -330,23 +401,16 @@ def compute_oee(enriched_events):
         "performance": performance,
         "quality": quality,
         "oee": oee,
+        "good_units": good_units,
+        "scrap_units": scrap_units,
+        "total_units": total_units,
+        "theoretical_good_units": theoretical_good_units,
+        "speed_loss_units": speed_loss_units,
+        "quality_loss_units": quality_loss_units,
+        "availability_loss_pct": availability_loss_pct,
+        "performance_loss_pct": performance_loss_pct,
+        "quality_loss_pct": quality_loss_pct,
     }
-
-
-def serialize_events(enriched_events):
-    return [
-        {
-            "start_ts": e["start_ts"].isoformat(),
-            "end_ts": e["end_ts"].isoformat(),
-            "minutes": e["duration_sec"] / 60.0,
-            "state_bucket": e["state_bucket"],
-            "reason_code": e["reason_code"],
-            "reason_category": e["reason_category"],
-            "is_missing": e["is_missing"],
-            "workorder": e["workorder"],
-        }
-        for e in enriched_events
-    ]
 
 def serialize_events(enriched_events):
     return [

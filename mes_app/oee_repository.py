@@ -7,27 +7,32 @@ def fetch_clipped_events(machine_code: str, start_ts: datetime, end_ts: datetime
     cursor = conn.cursor(dictionary=True)
     sql = """
     SELECT
-        de.id AS event_id,
-        de.raw_event_id,
-        m.code AS machine_code,
-        de.workorder,
-        rc.code AS reason_code,
-        rc.category AS reason_category,
-        CASE
-            WHEN rc.category = 'RUNNING' THEN 'RUNNING'
-            WHEN rc.category = 'PDT'     THEN 'PDT'
-            WHEN rc.category = 'UPDT'    THEN 'UPDT'
-            WHEN rc.category = 'OFF' AND rc.code = 'OFF_NO_SHIFT' THEN 'OFF_NO_SHIFT'
-            WHEN rc.category = 'OFF'     THEN 'OFF'
-            ELSE 'OTHER'
-        END AS state_bucket,
-        GREATEST(de.start_ts, %s) AS clipped_start_ts,
-        LEAST(de.end_ts,   %s)    AS clipped_end_ts,
-        TIMESTAMPDIFF(
-            SECOND,
-            GREATEST(de.start_ts, %s),
-            LEAST(de.end_ts,   %s)
-        ) AS adj_duration_sec
+    de.id AS event_id,
+    de.raw_event_id,
+    m.code AS machine_code,
+    de.workorder,
+    rc.code AS reason_code,
+    rc.category AS reason_category,
+    CASE
+        WHEN rc.category = 'RUNNING' THEN 'RUNNING'
+        WHEN rc.category = 'PDT'     THEN 'PDT'
+        WHEN rc.category = 'UPDT'    THEN 'UPDT'
+        WHEN rc.category = 'OFF' AND rc.code = 'OFF_NO_SHIFT' THEN 'OFF_NO_SHIFT'
+        WHEN rc.category = 'OFF'     THEN 'OFF'
+        ELSE 'OTHER'
+    END AS state_bucket,
+    GREATEST(de.start_ts, %s) AS clipped_start_ts,
+    LEAST(de.end_ts,   %s)    AS clipped_end_ts,
+    TIMESTAMPDIFF(
+        SECOND,
+        GREATEST(de.start_ts, %s),
+        LEAST(de.end_ts,   %s)
+    ) AS adj_duration_sec,
+    -- new fields for loss calculations
+    de.duration_sec        AS base_duration_sec,
+    de.units_total,
+    de.waste_total,
+    de.target_speed_ups
     FROM downtime_event de
     JOIN reason_code rc
       ON rc.id = de.reason_code_id

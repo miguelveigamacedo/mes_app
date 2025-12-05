@@ -7,22 +7,53 @@
 [33mPress CTRL+C to quit[0m
  * Restarting with stat
  * Debugger is active!
- * Debugger PIN: 904-307-305
-127.0.0.1 - - [05/Dec/2025 11:27:45] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:27:50] "[35m[1mGET /orders HTTP/1.1[0m" 500 -
+ * Debugger PIN: 388-197-089
+127.0.0.1 - - [05/Dec/2025 15:50:46] "[35m[1mGET /machines HTTP/1.1[0m" 500 -
 Traceback (most recent call last):
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/models.py", line 976, in json
-    return complexjson.loads(self.text, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
-    return _default_decoder.decode(s)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
-    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
-    raise JSONDecodeError("Expecting value", s, err.value) from None
-json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/connection.py", line 494, in request
+    self.endheaders()
+  File "/usr/lib/python3.12/http/client.py", line 1331, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.12/http/client.py", line 1091, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.12/http/client.py", line 1035, in send
+    self.connect()
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/connection.py", line 325, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7ee77c267fb0>: Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /departments (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ee77c267fb0>: Failed to establish a new connection: [Errno 111] Connection refused'))
 
 During handling of the above exception, another exception occurred:
 
@@ -45,73 +76,67 @@ Traceback (most recent call last):
   File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/ui/app.py", line 230, in orders_page
-    products = r_products.json()
-               ^^^^^^^^^^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/models.py", line 980, in json
-    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
-requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-127.0.0.1 - - [05/Dec/2025 11:27:50] "[36mGET /orders?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
-127.0.0.1 - - [05/Dec/2025 11:27:50] "[36mGET /orders?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
-127.0.0.1 - - [05/Dec/2025 11:27:50] "GET /orders?__debugger__=yes&cmd=resource&f=console.png&s=WqtUcnkJuS105ilOOXsy HTTP/1.1" 200 -
- * Detected change in '/home/miguelveigamacedo/mes_app/ui/app.py', reloading
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 904-307-305
-127.0.0.1 - - [05/Dec/2025 11:31:21] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:31:23] "[35m[1mGET /products HTTP/1.1[0m" 500 -
-Traceback (most recent call last):
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/models.py", line 976, in json
-    return complexjson.loads(self.text, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
-    return _default_decoder.decode(s)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
-    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
-    raise JSONDecodeError("Expecting value", s, err.value) from None
-json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
-    return self.wsgi_app(environ, start_response)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
-    response = self.handle_exception(e)
-               ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/ui/app.py", line 151, in products_page
-    products = r.json()
-               ^^^^^^^^
-  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/models.py", line 980, in json
-    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
-requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-127.0.0.1 - - [05/Dec/2025 11:31:23] "[36mGET /products?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
-127.0.0.1 - - [05/Dec/2025 11:31:23] "[36mGET /products?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
-127.0.0.1 - - [05/Dec/2025 11:31:23] "GET /products?__debugger__=yes&cmd=resource&f=console.png&s=Wq20U3kDebKPYTXIyN3C HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:12] "GET /products HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:15] "GET /orders HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:30] "GET /products HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:31] "GET /orders HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:32] "GET /oee HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:32] "GET /dash/oee/ HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:33] "GET /dash/oee/_dash-layout HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:33] "GET /dash/oee/_dash-dependencies HTTP/1.1" 200 -
-127.0.0.1 - - [05/Dec/2025 11:32:33] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-dropdown.js HTTP/1.1[0m" 304 -
-127.0.0.1 - - [05/Dec/2025 11:32:33] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-datepicker.js HTTP/1.1[0m" 304 -
-127.0.0.1 - - [05/Dec/2025 11:32:33] "POST /dash/oee/_dash-update-component HTTP/1.1" 200 -
+  File "/home/miguelveigamacedo/mes_app/ui/app.py", line 66, in machines_page
+    hierarchy, depts, lines, machines = build_isa95_hierarchy()
+                                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/ui/app.py", line 29, in build_isa95_hierarchy
+    depts = requests.get(f"{FASTAPI_BASE}/departments", timeout=3).json()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /departments (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ee77c267fb0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+127.0.0.1 - - [05/Dec/2025 15:50:46] "GET /machines?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:50:46] "GET /machines?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:50:46] "GET /machines?__debugger__=yes&cmd=resource&f=console.png&s=YZ2g4LPc4KL3QeuryVF3 HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:57:48] "GET /machines HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:45] "GET /oee HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:45] "GET /dash/oee/ HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:46] "GET /dash/oee/_dash-layout HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:46] "GET /dash/oee/_dash-dependencies HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:46] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-dropdown.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 15:58:46] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-datepicker.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 15:58:46] "POST /dash/oee/_dash-update-component HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:54] "GET /orders HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:56] "GET /products HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:58] "GET /oee HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:58] "GET /dash/oee/ HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:59] "GET /dash/oee/_dash-layout HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:59] "GET /dash/oee/_dash-dependencies HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:58:59] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-dropdown.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 15:58:59] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-datepicker.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 15:58:59] "POST /dash/oee/_dash-update-component HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:59:01] "GET /orders HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:59:03] "GET /oee HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:59:03] "GET /dash/oee/ HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:59:04] "GET /dash/oee/_dash-layout HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:59:04] "GET /dash/oee/_dash-dependencies HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 15:59:04] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-dropdown.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 15:59:04] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-datepicker.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 15:59:04] "POST /dash/oee/_dash-update-component HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:05:13] "GET /dash/oee/ HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:05:45] "GET /dash/oee/_dash-component-suites/dash/html/dash_html_components.min.js.map HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:05:45] "GET /dash/oee/_dash-component-suites/dash/dcc/dash_core_components-shared.js.map HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:05:45] "GET /dash/oee/_dash-component-suites/dash/dcc/async-datepicker.js.map HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:05:45] "GET /dash/oee/_dash-component-suites/dash/dash_table/bundle.js.map HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:05:45] "GET /dash/oee/_dash-component-suites/dash/dcc/async-dropdown.js.map HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:05:45] "GET /dash/oee/_dash-component-suites/dash/dcc/dash_core_components.js.map HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:07:03] "GET /orders HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:07:05] "GET /oee HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:07:06] "GET /dash/oee/ HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:07:06] "GET /dash/oee/_dash-layout HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:07:06] "GET /dash/oee/_dash-dependencies HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 16:07:06] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-dropdown.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 16:07:06] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-datepicker.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 16:07:06] "POST /dash/oee/_dash-update-component HTTP/1.1" 200 -
