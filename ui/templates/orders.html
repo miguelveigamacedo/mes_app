@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Work orders (order_run)</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="mt-2 mb-3">
+      {% for category, msg in messages %}
+        <div class="alert alert-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="row">
+
+  <!-- Orders list -->
+  <div class="col-md-8" style="max-height:75vh; overflow-y:auto; padding-right:10px;">
+    <div class="card mb-3">
+      <div class="card-header">Current orders</div>
+      <div class="card-body p-2">
+        <table class="table table-sm table-striped mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Workorder</th>
+              <th>Machine</th>
+              <th>Product</th>
+              <th>Planned qty</th>
+              <th>Status</th>
+              <th>Good</th>
+              <th>Scrap</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+            <tr>
+              <td>{{ o.id }}</td>
+              <td>{{ o.workorder }}</td>
+              <td>{{ o.machine_code }}</td>
+              <td>{{ o.product_code }}</td>
+              <td>{{ o.planned_qty or '' }}</td>
+              <td>{{ o.status }}</td>
+              <td>{{ o.qty_good or '' }}</td>
+              <td>{{ o.qty_scrap or '' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Update forms -->
+  <div class="col-md-4" style="padding-left:15px;">
+
+    <div class="card mb-3">
+      <div class="card-header">Create order</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('orders_create') }}">
+          <input name="workorder" class="form-control mb-2" placeholder="Workorder" required>
+
+          <select name="machine_id" class="form-select mb-2" required>
+            <option value="">Machine...</option>
+            {% for m in machines %}
+              <option value="{{ m.id }}">{{ m.code }}</option>
+            {% endfor %}
+          </select>
+
+          <select name="product_id" class="form-select mb-2">
+            <option value="">Product (optional)...</option>
+            {% for p in products %}
+              <option value="{{ p.id }}">{{ p.code }}</option>
+            {% endfor %}
+          </select>
+
+          <input name="planned_qty" class="form-control mb-2" placeholder="Planned qty (optional)">
+          <input name="start_ts" class="form-control mb-2" placeholder="Start ts (YYYY-MM-DDTHH:MM:SS)">
+          <input name="end_ts" class="form-control mb-2" placeholder="End ts (YYYY-MM-DDTHH:MM:SS)">
+          <input name="status" class="form-control mb-2" placeholder="Status (Created/Released/...)" value="Created">
+          <input name="qty_good" class="form-control mb-2" placeholder="Qty good (optional)">
+          <input name="qty_scrap" class="form-control mb-2" placeholder="Qty scrap (optional)">
+          <input name="runtime_sec" class="form-control mb-2" placeholder="Runtime sec (optional)">
+
+          <button class="btn btn-primary btn-sm">Add order</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">Update order</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('orders_update') }}">
+          <div class="mb-2">
+            <label class="form-label">Order to update</label>
+            <select name="order_id" class="form-select" required>
+              <option value="">Select...</option>
+              {% for o in orders %}
+                <option value="{{ o.id }}">{{ o.id }} – {{ o.workorder }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <small class="text-muted">Only fill fields you want to change.</small>
+          <input name="workorder" class="form-control mb-2" placeholder="New workorder (optional)">
+
+          <select name="machine_id" class="form-select mb-2">
+            <option value="">New machine (optional)...</option>
+            {% for m in machines %}
+              <option value="{{ m.id }}">{{ m.code }}</option>
+            {% endfor %}
+          </select>
+
+          <select name="product_id" class="form-select mb-2">
+            <option value="">New product (optional)...</option>
+            {% for p in products %}
+              <option value="{{ p.id }}">{{ p.code }}</option>
+            {% endfor %}
+          </select>
+
+          <input name="planned_qty" class="form-control mb-2" placeholder="New planned qty (optional)">
+          <input name="start_ts" class="form-control mb-2" placeholder="New start ts (optional)">
+          <input name="end_ts" class="form-control mb-2" placeholder="New end ts (optional)">
+          <input name="status" class="form-control mb-2" placeholder="New status (optional)">
+          <input name="qty_good" class="form-control mb-2" placeholder="New qty good (optional)">
+          <input name="qty_scrap" class="form-control mb-2" placeholder="New qty scrap (optional)">
+          <input name="runtime_sec" class="form-control mb-2" placeholder="New runtime sec (optional)">
+
+          <button class="btn btn-secondary btn-sm">Update order</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

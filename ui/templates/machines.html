@@ -1,23 +1,195 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<h2>Machines</h2>
+<h2>ISA-95 Production Structure</h2>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th><th>Code</th><th>Name</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for m in machines %}
-        <tr>
-            <td>{{ m.id }}</td>
-            <td>{{ m.code }}</td>
-            <td>{{ m.name }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="mt-2 mb-3">
+      {% for category, msg in messages %}
+        <div class="alert alert-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="row">
+
+  <!-- LEFT SIDE: scrollable hierarchy + lists -->
+  <div class="col-md-8" style="max-height:75vh; overflow-y:auto; padding-right:10px;">
+
+    {% for dept in hierarchy %}
+      <div class="card mb-3">
+        <div class="card-header">
+          <strong>🏭 {{ dept.code }}</strong> – {{ dept.name }}
+        </div>
+        <div class="card-body">
+          {% if dept.description %}
+            <p class="text-muted small mb-2">{{ dept.description }}</p>
+          {% endif %}
+
+          {% if dept.lines %}
+            {% for line in dept.lines %}
+              <div class="mb-2 p-2 border rounded bg-light">
+                <div class="d-flex justify-content-between">
+                  <div><strong>📦 {{ line.code }}</strong> – {{ line.name }}</div>
+                  <div class="text-muted small">
+                    ⚙️ Machines: {{ line.machines|length }}
+                  </div>
+                </div>
+
+                {% if line.machines %}
+                  <table class="table table-sm table-striped mt-1 mb-0">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>⚙️ Code</th>
+                        <th>Name</th>
+                        <th>Active</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for m in line.machines %}
+                        <tr>
+                          <td>{{ m.id }}</td>
+                          <td>{{ m.code }}</td>
+                          <td>{{ m.name }}</td>
+                          <td>{{ 'Yes' if m.is_active else 'No' }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                {% else %}
+                  <div class="text-muted small mt-1">No machines yet.</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-muted small">No lines yet.</div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <!-- Flat department list -->
+    <div class="card mb-3">
+      <div class="card-header">🏭 All Departments</div>
+      <div class="card-body p-2">
+        <table class="table table-sm table-striped mb-0">
+          <thead>
+            <tr><th>ID</th><th>Code</th><th>Name</th></tr>
+          </thead>
+          <tbody>
+            {% for d in departments %}
+            <tr>
+              <td>{{ d.id }}</td>
+              <td>{{ d.code }}</td>
+              <td>{{ d.name }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Flat line list -->
+    <div class="card mb-3">
+      <div class="card-header">📦 All Lines</div>
+      <div class="card-body p-2">
+        <table class="table table-sm table-striped mb-0">
+          <thead>
+            <tr><th>ID</th><th>Code</th><th>Name</th><th>Dept</th></tr>
+          </thead>
+          <tbody>
+            {% for l in lines %}
+            <tr>
+              <td>{{ l.id }}</td>
+              <td>{{ l.code }}</td>
+              <td>{{ l.name }}</td>
+              <td>{{ l.department_code }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Flat machines list -->
+    <div class="card mb-3">
+      <div class="card-header">⚙️ All Machines</div>
+      <div class="card-body p-2">
+        <table class="table table-sm table-striped mb-0">
+          <thead>
+            <tr><th>ID</th><th>Code</th><th>Name</th><th>Line</th></tr>
+          </thead>
+          <tbody>
+            {% for m in machines %}
+            <tr>
+              <td>{{ m.id }}</td>
+              <td>{{ m.code }}</td>
+              <td>{{ m.name }}</td>
+              <td>{{ m.line_code }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDE: creation panel -->
+  <div class="col-md-4" style="padding-left:15px;">
+
+    <div class="card mb-3">
+      <div class="card-header">🏭 Create Department</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('isa95_create_department') }}">
+          <input name="code" class="form-control mb-2" placeholder="Code" required>
+          <input name="name" class="form-control mb-2" placeholder="Name" required>
+          <input name="description" class="form-control mb-2" placeholder="Description">
+          <button class="btn btn-primary btn-sm">Add department</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">📦 Create Line</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('isa95_create_line') }}">
+          <select name="department_id" class="form-select mb-2" required>
+            <option value="">Department...</option>
+            {% for d in departments %}
+              <option value="{{ d.id }}">{{ d.code }} – {{ d.name }}</option>
+            {% endfor %}
+          </select>
+          <input name="code" class="form-control mb-2" placeholder="Code" required>
+          <input name="name" class="form-control mb-2" placeholder="Name" required>
+          <input name="description" class="form-control mb-2" placeholder="Description">
+          <button class="btn btn-primary btn-sm">Add line</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">⚙️ Create Machine</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('isa95_create_machine') }}">
+          <select name="line_id" class="form-select mb-2" required>
+            <option value="">Line...</option>
+            {% for l in lines %}
+              <option value="{{ l.id }}">{{ l.department_code }} / {{ l.code }} – {{ l.name }}</option>
+            {% endfor %}
+          </select>
+          <input name="code" class="form-control mb-2" placeholder="Code" required>
+          <input name="name" class="form-control mb-2" placeholder="Name" required>
+          <button class="btn btn-primary btn-sm">Add machine</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</div>
 
 {% endblock %}

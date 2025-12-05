@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Products</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="mt-2 mb-3">
+      {% for category, msg in messages %}
+        <div class="alert alert-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="row">
+
+  <!-- Products list -->
+  <div class="col-md-8" style="max-height:75vh; overflow-y:auto; padding-right:10px;">
+    <div class="card mb-3">
+      <div class="card-header">Current products</div>
+      <div class="card-body p-2">
+        <table class="table table-sm table-striped mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Pack</th>
+              <th>Nom speed</th>
+              <th>Target OEE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in products %}
+            <tr>
+              <td>{{ p.id }}</td>
+              <td>{{ p.code }}</td>
+              <td>{{ p.name }}</td>
+              <td>{{ p.pack_count or '' }}</td>
+              <td>{{ p.nominal_speed_upm or '' }}</td>
+              <td>{{ p.target_oee or '' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Update forms -->
+  <div class="col-md-4" style="padding-left:15px;">
+
+    <div class="card mb-3">
+      <div class="card-header">Create product</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('products_create') }}">
+          <input name="code" class="form-control mb-2" placeholder="Code" required>
+          <input name="name" class="form-control mb-2" placeholder="Name" required>
+          <input name="pack_count" class="form-control mb-2" placeholder="Pack count (optional)">
+          <input name="nominal_speed_upm" class="form-control mb-2" placeholder="Nominal speed UPM (optional)">
+          <input name="target_oee" class="form-control mb-2" placeholder="Target OEE % (optional)">
+          <button class="btn btn-primary btn-sm">Add product</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header">Update product</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('products_update') }}">
+          <div class="mb-2">
+            <label class="form-label">Product to update</label>
+            <select name="product_id" class="form-select" required>
+              <option value="">Select...</option>
+              {% for p in products %}
+                <option value="{{ p.id }}">{{ p.id }} – {{ p.code }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <small class="text-muted">Only fill the fields you want to change.</small>
+          <input name="code" class="form-control mb-2" placeholder="New code (optional)">
+          <input name="name" class="form-control mb-2" placeholder="New name (optional)">
+          <input name="pack_count" class="form-control mb-2" placeholder="New pack count (optional)">
+          <input name="nominal_speed_upm" class="form-control mb-2" placeholder="New nominal speed (optional)">
+          <input name="target_oee" class="form-control mb-2" placeholder="New target OEE (optional)">
+          <button class="btn btn-secondary btn-sm">Update product</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

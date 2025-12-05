@@ -1,0 +1,191 @@
+INFO:     Will watch for changes in these directories: ['/home/miguelveigamacedo/mes_app']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [5242] using WatchFiles
+INFO:     Started server process [5257]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:54836 - "GET /machines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54838 - "GET /events HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54840 - "GET /reason-codes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54848 - "GET /machines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54854 - "GET /events HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54858 - "GET /reason-codes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53200 - "GET /order-runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53208 - "GET /products HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 772, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Unknown column 'nominal_speed_upm' in 'field list'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1134, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/routing.py", line 125, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/routing.py", line 111, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/routing.py", line 391, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/routing.py", line 292, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/concurrency.py", line 38, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2485, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 976, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/mes_app/main.py", line 446, in list_products
+    cursor.execute(
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 353, in execute
+    self._connection.cmd_query(
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 781, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1054 (42S22): Unknown column 'nominal_speed_upm' in 'field list'
+WARNING:  WatchFiles detected changes in 'ui/app.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [5257]
+INFO:     Started server process [8908]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:39634 - "GET /machines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39644 - "GET /events HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39646 - "GET /reason-codes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50468 - "GET /products HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 772, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Unknown column 'nominal_speed_upm' in 'field list'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1134, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/routing.py", line 125, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/routing.py", line 111, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/routing.py", line 391, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/fastapi/routing.py", line 292, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/starlette/concurrency.py", line 38, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2485, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 976, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/mes_app/main.py", line 446, in list_products
+    cursor.execute(
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/mysql/connector/cursor_cext.py", line 353, in execute
+    self._connection.cmd_query(
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/mysql/connector/opentelemetry/context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/mysql/connector/connection_cext.py", line 781, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1054 (42S22): Unknown column 'nominal_speed_upm' in 'field list'
+WARNING:  WatchFiles detected changes in 'mes_app/main.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8908]
+INFO:     Started server process [9011]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:60602 - "GET /products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60608 - "GET /order-runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60616 - "GET /products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60626 - "GET /machines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38370 - "GET /products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52292 - "GET /order-runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52306 - "GET /products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52322 - "GET /machines HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52326 - "GET /oee?machine_code=T01&start_ts=2025-11-29T06%3A00%3A00&end_ts=2025-12-05T18%3A00%3A00 HTTP/1.1" 200 OK

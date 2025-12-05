@@ -1,5 +1,13 @@
 README – Startup Commands
 
+
+UPDATED just run:
+
+ ./start_mes.sh 
+
+from the root folder
+
+
 Start MySQL (if not already running):
 sudo systemctl start mysql
 

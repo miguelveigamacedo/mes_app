@@ -1,0 +1,117 @@
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.0.2.15:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 904-307-305
+127.0.0.1 - - [05/Dec/2025 11:27:45] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:27:50] "[35m[1mGET /orders HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/models.py", line 976, in json
+    return complexjson.loads(self.text, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/ui/app.py", line 230, in orders_page
+    products = r_products.json()
+               ^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/models.py", line 980, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+127.0.0.1 - - [05/Dec/2025 11:27:50] "[36mGET /orders?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 11:27:50] "[36mGET /orders?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 11:27:50] "GET /orders?__debugger__=yes&cmd=resource&f=console.png&s=WqtUcnkJuS105ilOOXsy HTTP/1.1" 200 -
+ * Detected change in '/home/miguelveigamacedo/mes_app/ui/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 904-307-305
+127.0.0.1 - - [05/Dec/2025 11:31:21] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:31:23] "[35m[1mGET /products HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/models.py", line 976, in json
+    return complexjson.loads(self.text, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/ui/app.py", line 151, in products_page
+    products = r.json()
+               ^^^^^^^^
+  File "/home/miguelveigamacedo/mes_app/venv/lib/python3.12/site-packages/requests/models.py", line 980, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+127.0.0.1 - - [05/Dec/2025 11:31:23] "[36mGET /products?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 11:31:23] "[36mGET /products?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 11:31:23] "GET /products?__debugger__=yes&cmd=resource&f=console.png&s=Wq20U3kDebKPYTXIyN3C HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:12] "GET /products HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:15] "GET /orders HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:30] "GET /products HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:31] "GET /orders HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:32] "GET /oee HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:32] "GET /dash/oee/ HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:33] "GET /dash/oee/_dash-layout HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:33] "GET /dash/oee/_dash-dependencies HTTP/1.1" 200 -
+127.0.0.1 - - [05/Dec/2025 11:32:33] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-dropdown.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 11:32:33] "[36mGET /dash/oee/_dash-component-suites/dash/dcc/async-datepicker.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [05/Dec/2025 11:32:33] "POST /dash/oee/_dash-update-component HTTP/1.1" 200 -
