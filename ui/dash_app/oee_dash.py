@@ -2,8 +2,11 @@ import dash
 from dash import html, dcc, Input, Output, State
 import requests
 from datetime import timedelta, date
+import plotly.graph_objects as go
+import logging
 
 MES_API = "http://localhost:8000"
+log = logging.getLogger(__name__)
 
 
 def fetch_machines():
@@ -168,40 +171,193 @@ def render_loss_tree(oee_data):
         ])
     ], style={"borderCollapse": "collapse", "width": "100%", "marginTop": "4px"})
 
-    speed_quality_table = html.Table([
+    raw_speed_loss_min = oee.get("speed_loss_min")
+    raw_quality_loss_min = oee.get("quality_loss_min")
+
+    # If speed/quality loss cannot be computed, treat them as zero.
+    speed_loss_min = raw_speed_loss_min if raw_speed_loss_min is not None else 0.0
+    quality_loss_min = raw_quality_loss_min if raw_quality_loss_min is not None else 0.0
+
+    # Loss percentages based on scheduled time (minutes equivalent / planned time)
+    speed_loss_pct_of_planned = (
+        (speed_loss_min / planned) if planned else None
+    )
+    quality_loss_pct_of_planned = (
+        (quality_loss_min / planned) if planned else None
+    )
+
+    speed_loss_table = html.Table([
         html.Thead(html.Tr([
             html.Th("Metric", style=cell),
             html.Th("Value", style=cell),
         ], style=header_row)),
         html.Tbody([
             html.Tr([
-                html.Td("Good units", style=cell),
-                html.Td(fmt_units(oee.get("good_units")), style=cell),
+                html.Td("Minutes lost", style=cell),
+                html.Td(fmt_min(speed_loss_min), style=cell),
             ]),
             html.Tr([
-                html.Td("Quality loss (scrap units)", style=cell),
-                html.Td(fmt_units(oee.get("quality_loss_units")), style=cell),
-            ]),
-            html.Tr([
-                html.Td("Speed loss (units)", style=cell),
-                html.Td(fmt_units(oee.get("speed_loss_units")), style=cell),
-            ]),
-            html.Tr([
-                html.Td("Theoretical good @ target speed", style=cell),
-                html.Td(fmt_units(oee.get("theoretical_good_units")), style=cell),
-            ]),
-            html.Tr([
-                html.Td("Performance loss", style=cell),
-                html.Td(fmt_pct(oee.get("performance_loss_pct")), style=cell),
-            ]),
-            html.Tr([
-                html.Td("Quality loss", style=cell),
-                html.Td(fmt_pct(oee.get("quality_loss_pct")), style=cell),
+                html.Td("OEE loss (performance)", style=cell),
+                html.Td(fmt_pct(speed_loss_pct_of_planned), style=cell),
             ]),
         ])
-    ], style={"borderCollapse": "collapse", "width": "340px"})
+    ], style={"borderCollapse": "collapse", "width": "220px"})
+
+    quality_loss_table = html.Table([
+        html.Thead(html.Tr([
+            html.Th("Metric", style=cell),
+            html.Th("Value", style=cell),
+        ], style=header_row)),
+        html.Tbody([
+            html.Tr([
+                html.Td("Minutes lost", style=cell),
+                html.Td(fmt_min(quality_loss_min), style=cell),
+            ]),
+            html.Tr([
+                html.Td("OEE loss (quality)", style=cell),
+                html.Td(fmt_pct(quality_loss_pct_of_planned), style=cell),
+            ]),
+        ])
+    ], style={"borderCollapse": "collapse", "width": "220px"})
+
+    # -----------------------------
+    # Mini OEE dashboard (top strip)
+    # -----------------------------
+    oee_value = oee.get("oee")
+    # Use 0% for OEE in the bar when it cannot be computed
+    oee_pct_for_bar = oee_value if (oee_value is not None and oee_value > 0.0) else 0.0
+
+    # Build a 100%-stacked breakdown whose "OEE" slice
+    # matches the numeric OEE value (or 0% if not available),
+    # and the loss slices are proportional to their minutes.
+    planned_min = planned or 0.0
+    labels = []
+    values = []
+    colors = []
+
+    if planned_min > 0:
+        pdt_min = max(pdt or 0.0, 0.0)
+        updt_min = max(updt or 0.0, 0.0)
+        speed_loss_min_val = max(speed_loss_min or 0.0, 0.0)
+        quality_loss_min_val = max(quality_loss_min or 0.0, 0.0)
+
+        # Loss shares from minutes
+        pdt_pct = pdt_min / planned_min
+        updt_pct = updt_min / planned_min
+        speed_pct = speed_loss_min_val / planned_min
+        quality_pct = quality_loss_min_val / planned_min
+
+        loss_sum = pdt_pct + updt_pct + speed_pct + quality_pct
+        remaining_for_losses = max(1.0 - oee_pct_for_bar, 0.0)
+
+        # Debug logging for mini-bar composition
+        log.info(
+            "OEE mini-bar: planned_min=%s, oee_value=%s, "
+            "pdt_min=%s, updt_min=%s, speed_loss_min=%s, quality_loss_min=%s, "
+            "pdt_pct=%s, updt_pct=%s, speed_pct=%s, quality_pct=%s, "
+            "loss_sum=%s, remaining_for_losses=%s",
+            planned_min,
+            oee_value,
+            pdt_min,
+            updt_min,
+            speed_loss_min_val,
+            quality_loss_min_val,
+            pdt_pct,
+            updt_pct,
+            speed_pct,
+            quality_pct,
+            loss_sum,
+            remaining_for_losses,
+        )
+
+        if loss_sum > 0 and remaining_for_losses > 0:
+            scale = remaining_for_losses / loss_sum
+            # Non-OEE components first so OEE appears last/right
+            components = [
+                ("PDT", pdt_pct * scale, "#ffb74d"),
+                ("UPDT", updt_pct * scale, "#e57373"),
+                ("Speed loss", speed_pct * scale, "#64b5f6"),
+                ("Quality loss", quality_pct * scale, "#ba68c8"),
+                ("OEE", oee_pct_for_bar, "#2e7d32"),
+            ]
+        else:
+            # No visible losses -> pure OEE bar
+            components = [("OEE", oee_pct_for_bar, "#2e7d32")]
+
+        total = sum(v for _, v, _ in components)
+        log.info("OEE mini-bar components (raw): %s (total=%s)", components, total)
+        if total > 0:
+            for label, val, col in components:
+                labels.append(label)
+                values.append(val / total)
+                colors.append(col)
+
+    if values:
+        # One trace per component so they truly stack
+        traces = []
+        for label, val, col in zip(labels, values, colors):
+            opacity = 1.0 if label == "OEE" else 0.5
+            traces.append(
+                go.Bar(
+                    x=[val],
+                    y=["OEE breakdown"],
+                    orientation="h",
+                    marker=dict(color=col, opacity=opacity),
+                    text=[f"{val * 100:.1f}%"],
+                    textposition="inside",
+                    textfont=dict(size=12),
+                    hovertemplate=f"{label}: {{x:.1%}}<extra></extra>",
+                    customdata=[[label]],
+                    name=label,
+                )
+            )
+        fig = go.Figure(data=traces)
+        fig.update_layout(
+            barmode="stack",
+            showlegend=False,
+            margin=dict(l=0, r=0, t=0, b=0),
+            xaxis=dict(showticklabels=False, showgrid=False, zeroline=False, range=[0, 1]),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False),
+            height=80,
+        )
+    else:
+        fig = go.Figure()
+        fig.update_layout(
+            showlegend=False,
+            margin=dict(l=0, r=0, t=0, b=0),
+            xaxis=dict(showticklabels=False, showgrid=False, zeroline=False),
+            yaxis=dict(showticklabels=False, showgrid=False, zeroline=False),
+            height=80,
+        )
+
+    oee_value_text = "-" if oee_value is None else f"{oee_value * 100:.2f}%"
+
+    mini_dashboard = html.Div([
+        html.Div([
+            html.Div("OEE", style={"fontSize": "12px", "color": "#666"}),
+            html.Div(
+                oee_value_text,
+                style={"fontSize": "28px", "fontWeight": "700", "color": "#2e7d32"},
+            ),
+        ], style={"marginRight": "24px", "minWidth": "120px"}),
+        html.Div([
+            dcc.Graph(
+                id="oee-mini-bar",
+                figure=fig,
+                config={"displayModeBar": False},
+                style={"height": "80px", "width": "360px"},
+            )
+        ]),
+    ], style={
+        "display": "flex",
+        "alignItems": "center",
+        "columnGap": "12px",
+        "margin": "8px 0 16px 0",
+    })
 
     return html.Div([
+        mini_dashboard,
+
         html.Div([
             html.Div("Period summary", style={"fontWeight": "600", "marginBottom": "4px"}),
             header_table,
@@ -249,8 +405,19 @@ def render_loss_tree(oee_data):
         }),
 
         html.Div([
-            html.Div("Speed and quality losses", style={"fontWeight": "600", "marginBottom": "4px"}),
-            speed_quality_table,
+            html.Div("Rate loss (speed)", style={"fontWeight": "600", "marginBottom": "4px"}),
+            speed_loss_table,
+        ], style={
+            "backgroundColor": "#fdfbf4",
+            "border": "1px solid #eddca9",
+            "borderRadius": "6px",
+            "padding": "8px 12px",
+            "marginBottom": "16px"
+        }),
+
+        html.Div([
+            html.Div("Quality loss", style={"fontWeight": "600", "marginBottom": "4px"}),
+            quality_loss_table,
         ], style={
             "backgroundColor": "#fdfbf4",
             "border": "1px solid #eddca9",
@@ -279,11 +446,36 @@ def init_dashboard(flask_app):
 
         html.Div([
             html.Div([
+                html.Label("Department"),
+                dcc.Dropdown(
+                    id="oee-department",
+                    options=[],
+                    value=None,
+                    placeholder="Select department",
+                    clearable=True,
+                    style={"width": "220px"}
+                ),
+            ], style={"marginRight": "16px"}),
+
+            html.Div([
+                html.Label("Line"),
+                dcc.Dropdown(
+                    id="oee-line",
+                    options=[],
+                    value=None,
+                    placeholder="Select line",
+                    clearable=True,
+                    style={"width": "220px"}
+                ),
+            ], style={"marginRight": "16px"}),
+
+            html.Div([
                 html.Label("Machine"),
                 dcc.Dropdown(
                     id="oee-machine",
                     options=[],
                     value=None,
+                    placeholder="Select machine",
                     clearable=False,
                     style={"width": "220px"}
                 )
@@ -296,6 +488,7 @@ def init_dashboard(flask_app):
                     start_date=default_start_date,
                     end_date=default_end_date,
                     display_format="YYYY-MM-DD",
+                    minimum_nights=0,
                 )
             ], style={"marginRight": "16px"}),
 
@@ -343,6 +536,7 @@ def init_dashboard(flask_app):
                      style={"fontSize": "12px"})
         ]),
 
+        dcc.Store(id="oee-machines-store"),
         dcc.Interval(id="oee-machine-loader", interval=500, n_intervals=0, max_intervals=1),
 
         html.Div(id="oee-machine-error", style={"color": "red", "marginBottom": "4px"}),
@@ -351,8 +545,9 @@ def init_dashboard(flask_app):
     ])
 
     @dash_app.callback(
-        Output("oee-machine", "options"),
-        Output("oee-machine", "value"),
+        Output("oee-machines-store", "data"),
+        Output("oee-department", "options"),
+        Output("oee-department", "value"),
         Output("oee-machine-error", "children"),
         Input("oee-machine-loader", "n_intervals"),
         prevent_initial_call=False,
@@ -360,11 +555,103 @@ def init_dashboard(flask_app):
     def load_machines(n_intervals):
         machines = fetch_machines()
         if not machines:
-            return [], None, "No machines available. Check the API connection."
+            return [], [], None, "No machines available. Check the API connection."
 
-        machine_options = [{"label": m.get("name", m.get("code")), "value": m.get("code")} for m in machines]
-        default_machine = machine_options[0]["value"] if machine_options else None
-        return machine_options, default_machine, ""
+        dept_map = {}
+        for m in machines:
+            dept_code = m.get("department_code")
+            dept_name = m.get("department_name")
+            if not dept_code:
+                continue
+            if dept_code not in dept_map:
+                label = f"{dept_code} – {dept_name}" if dept_name else dept_code
+                dept_map[dept_code] = {"label": label, "value": dept_code}
+
+        dept_options = sorted(dept_map.values(), key=lambda d: d["value"])
+        default_dept = dept_options[0]["value"] if dept_options else None
+        return machines, dept_options, default_dept, ""
+
+    @dash_app.callback(
+        Output("oee-line", "options"),
+        Output("oee-line", "value"),
+        Input("oee-department", "value"),
+        State("oee-machines-store", "data"),
+        State("oee-line", "value"),
+    )
+    def update_lines(selected_department, machines, current_line):
+        if not machines:
+            return [], None
+
+        filtered = machines
+        if selected_department:
+            filtered = [
+                m for m in machines
+                if m.get("department_code") == selected_department
+            ]
+
+        line_map = {}
+        for m in filtered:
+            line_code = m.get("line_code")
+            line_name = m.get("line_name")
+            if not line_code:
+                continue
+            if line_code not in line_map:
+                label = f"{line_code} – {line_name}" if line_name else line_code
+                line_map[line_code] = {"label": label, "value": line_code}
+
+        line_options = sorted(line_map.values(), key=lambda l: l["value"])
+
+        selected_line = None
+        if current_line and any(opt["value"] == current_line for opt in line_options):
+            selected_line = current_line
+        elif line_options:
+            selected_line = line_options[0]["value"]
+
+        return line_options, selected_line
+
+    @dash_app.callback(
+        Output("oee-machine", "options"),
+        Output("oee-machine", "value"),
+        Input("oee-department", "value"),
+        Input("oee-line", "value"),
+        State("oee-machines-store", "data"),
+        State("oee-machine", "value"),
+    )
+    def update_machines(selected_department, selected_line, machines, current_machine):
+        if not machines:
+            return [], None
+
+        filtered = machines
+        if selected_department:
+            filtered = [
+                m for m in filtered
+                if m.get("department_code") == selected_department
+            ]
+        if selected_line:
+            filtered = [
+                m for m in filtered
+                if m.get("line_code") == selected_line
+            ]
+
+        machine_map = {}
+        for m in filtered:
+            code = m.get("code")
+            name = m.get("name")
+            if not code:
+                continue
+            if code not in machine_map:
+                label = f"{code} – {name}" if name else code
+                machine_map[code] = {"label": label, "value": code}
+
+        machine_options = sorted(machine_map.values(), key=lambda x: x["value"])
+
+        selected_machine = None
+        if current_machine and any(opt["value"] == current_machine for opt in machine_options):
+            selected_machine = current_machine
+        elif machine_options:
+            selected_machine = machine_options[0]["value"]
+
+        return machine_options, selected_machine
 
     @dash_app.callback(
         Output("oee-loss-tree-container", "children"),

@@ -7,6 +7,15 @@ from datetime import datetime
 MES_API = "http://localhost:8000"
 
 
+def fetch_machines():
+    try:
+        r = requests.get(f"{MES_API}/machines", timeout=3)
+        r.raise_for_status()
+        return r.json()
+    except Exception:
+        return []
+
+
 def fetch_events():
     try:
         r = requests.get(f"{MES_API}/events", timeout=3)
@@ -43,6 +52,7 @@ def init_events_dashboard(flask_app):
     )
 
     df = fetch_events()
+    machines = fetch_machines()
 
     display_cols = [
         "id",
@@ -60,11 +70,25 @@ def init_events_dashboard(flask_app):
     ]
 
     if df.empty:
-        machine_options = []
+        machine_codes = []
         data_rows = []
     else:
-        machine_options = sorted(df["machine_code"].dropna().unique())
+        machine_codes = sorted(df["machine_code"].dropna().unique())
         data_rows = df[display_cols].to_dict("records")
+
+    if machines:
+        machine_options = []
+        for m in machines:
+            code = m.get("code")
+            if not code:
+                continue
+            label = code
+            name = m.get("name")
+            if name:
+                label = f"{code} - {name}"
+            machine_options.append({"label": label, "value": code})
+    else:
+        machine_options = [{"label": c, "value": c} for c in machine_codes]
 
     # Reason list for justification
     reasons = fetch_reasons()
@@ -98,9 +122,10 @@ def init_events_dashboard(flask_app):
                             html.Label("Machine"),
                             dcc.Dropdown(
                                 id="machine-filter",
-                                options=[{"label": m, "value": m} for m in machine_options],
+                                options=machine_options,
                                 placeholder="All machines",
                                 clearable=True,
+                                multi=False,
                             ),
                         ],
                         style={"width": "25%", "display": "inline-block", "marginRight": "20px"},
@@ -224,6 +249,9 @@ def init_events_dashboard(flask_app):
         if df_local.empty:
             return []
 
+        if isinstance(machine_value, (list, tuple)):
+            machine_value = machine_value[0] if machine_value else None
+
         if machine_value:
             df_local = df_local[df_local["machine_code"] == machine_value]
 
@@ -268,6 +296,9 @@ def init_events_dashboard(flask_app):
     def justify_event(n_clicks, selected_rows, table_data,
                       reason_id, comment,
                       machine_value, from_date, from_time, to_date, to_time):
+
+        if isinstance(machine_value, (list, tuple)):
+            machine_value = machine_value[0] if machine_value else None
 
         if not selected_rows:
             return "Select an event first.", dash.no_update

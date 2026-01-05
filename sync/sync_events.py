@@ -51,7 +51,7 @@ def run_sync():
     rc.id AS reason_code_id,
     NULL,
     'Auto'
-    FROM mes.MachineStatusEvent mse
+    FROM historian.MachineStatusEvent mse
     JOIN mes_core.machine m
     ON m.code = mse.MachineId
     LEFT JOIN mes_core.downtime_event d
@@ -79,7 +79,7 @@ def run_sync():
                 PARTITION BY mse.MachineId
                 ORDER BY mse.Ts
             ) AS next_ts
-        FROM mes.MachineStatusEvent mse
+        FROM historian.MachineStatusEvent mse
         WHERE mse.Ts >= (NOW() - INTERVAL 60 MINUTE)
     ) v
         ON v.raw_event_id = d.raw_event_id

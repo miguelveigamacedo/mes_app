@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container-fluid mt-3">
+  <h2>Historical Performance</h2>
+  <p>Historical performance per shift, using the same selectors as the OEE dashboard.</p>
+
+  <iframe
+      src="/dash/historical/"
+      style="width: 100%; height: 800px; border: none; background: white;">
+  </iframe>
+</div>
+
+{% endblock %}
+

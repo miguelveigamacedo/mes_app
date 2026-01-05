@@ -1,3 +1,4 @@
+import logging
 from flask import (
     Flask,
     render_template,
@@ -8,8 +9,15 @@ from flask import (
 )
 import requests
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+)
+
 from dash_app.oee_dash import init_dashboard
 from dash_app.events_dash import init_events_dashboard
+from dash_app.historical_dash import init_historical_dashboard
+from dash_app.line_events_dash import init_line_events_dashboard
 
 FASTAPI_BASE = "http://localhost:8000"
 
@@ -19,8 +27,10 @@ def create_app():
     app.secret_key = "change-this-in-prod"
 
     # Dash apps
-    init_dashboard(app)         # /dash/oee/
-    init_events_dashboard(app)  # /dash/events/
+    init_dashboard(app)                # /dash/oee/
+    init_events_dashboard(app)         # /dash/events/
+    init_historical_dashboard(app)     # /dash/historical/
+    init_line_events_dashboard(app)    # /dash/line-events/
 
     # -----------------------------
     # Helper: ISA-95 hierarchy
@@ -80,6 +90,14 @@ def create_app():
     @app.route("/events")
     def events_page():
         return render_template("events.html", title="Events")
+
+    @app.route("/historical")
+    def historical_page():
+        return render_template("historical.html", title="Historical Performance")
+
+    @app.route("/line-events")
+    def line_events_page():
+        return render_template("line_events.html", title="Line Event Visualization")
 
     # Optional alias for plant model
     @app.route("/isa95")
@@ -308,4 +326,3 @@ def create_app():
 if __name__ == "__main__":
     app = create_app()
     app.run(host="0.0.0.0", port=5000, debug=True)
-

@@ -391,6 +391,17 @@ def compute_oee(enriched_events):
     )
     quality_loss_units = scrap_units
 
+    # Convert speed/quality losses into equivalent minutes at average target speed
+    speed_loss_min = None
+    quality_loss_min = None
+    if theoretical_good_units > 0 and running_sec > 0:
+        avg_target_speed_ups = theoretical_good_units / float(running_sec)
+        if avg_target_speed_ups > 0:
+            if speed_loss_units is not None:
+                speed_loss_min = speed_loss_units / avg_target_speed_ups / 60.0
+            if quality_loss_units is not None:
+                quality_loss_min = quality_loss_units / avg_target_speed_ups / 60.0
+
     availability_loss_pct = 1.0 - availability if availability is not None else None
     performance_loss_pct = 1.0 - performance if performance is not None else None
     quality_loss_pct = 1.0 - quality if quality is not None else None
@@ -409,7 +420,9 @@ def compute_oee(enriched_events):
         "total_units": total_units,
         "theoretical_good_units": theoretical_good_units,
         "speed_loss_units": speed_loss_units,
+        "speed_loss_min": speed_loss_min,
         "quality_loss_units": quality_loss_units,
+        "quality_loss_min": quality_loss_min,
         "availability_loss_pct": availability_loss_pct,
         "performance_loss_pct": performance_loss_pct,
         "quality_loss_pct": quality_loss_pct,
